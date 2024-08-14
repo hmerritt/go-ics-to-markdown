@@ -5,10 +5,12 @@ import (
 	"hmerritt/go-ics-to-markdown/version"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
 
+	md "github.com/JohannesKaufmann/html-to-markdown"
 	ics "github.com/arran4/golang-ical"
 )
 
@@ -51,6 +53,8 @@ func convertIcsToMarkdown(filePath string) string {
 		return ""
 	}
 
+	htmlToMd := md.NewConverter("", true, nil)
+
 	var events []Event
 	for _, component := range calendar.Components {
 		if event, ok := component.(*ics.VEvent); ok {
@@ -64,11 +68,15 @@ func convertIcsToMarkdown(filePath string) string {
 			if descProp := event.GetProperty(ics.ComponentPropertyDescription); descProp != nil {
 				description = descProp.Value
 			}
+			markdown, err := htmlToMd.ConvertString(description)
+			if err == nil {
+				description = markdown
+			}
 			events = append(events, Event{
 				Summary:     summary,
 				Start:       start,
 				End:         end,
-				Description: description,
+				Description: removeLineBreaks(description),
 			})
 		}
 	}
@@ -89,4 +97,9 @@ func convertIcsToMarkdown(filePath string) string {
 	}
 
 	return markdown
+}
+
+func removeLineBreaks(text string) string {
+	re := regexp.MustCompile(`\x{000D}\x{000A}|[\x{000A}\x{000B}\x{000C}\x{000D}\x{0085}\x{2028}\x{2029}]`)
+	return re.ReplaceAllString(text, `<br>`)
 }
