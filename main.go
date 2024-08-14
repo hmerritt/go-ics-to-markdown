@@ -19,6 +19,7 @@ type Event struct {
 	Start       time.Time
 	End         time.Time
 	Description string
+	Location    string
 }
 
 func main() {
@@ -61,10 +62,13 @@ func convertIcsToMarkdown(filePath string) string {
 			start, _ := event.GetStartAt()
 			end, _ := event.GetEndAt()
 			summary := ""
+			description := ""
+			location := ""
+
 			if summaryProp := event.GetProperty(ics.ComponentPropertySummary); summaryProp != nil {
 				summary = summaryProp.Value
 			}
-			description := ""
+
 			if descProp := event.GetProperty(ics.ComponentPropertyDescription); descProp != nil {
 				description = descProp.Value
 			}
@@ -72,10 +76,16 @@ func convertIcsToMarkdown(filePath string) string {
 			if err == nil {
 				description = markdown
 			}
+
+			if locationProp := event.GetProperty(ics.ComponentPropertyLocation); locationProp != nil {
+				location = locationProp.Value
+			}
+
 			events = append(events, Event{
 				Summary:     summary,
 				Start:       start,
 				End:         end,
+				Location:    location,
 				Description: removeLineBreaks(description),
 			})
 		}
@@ -85,15 +95,15 @@ func convertIcsToMarkdown(filePath string) string {
 		return events[i].Start.Before(events[j].Start)
 	})
 
-	markdown := "| Date | Time | Event | Description |\n"
-	markdown += "|------|------|-------|-------------|\n"
+	markdown := "| Date | Time | Location | Event | Description |\n"
+	markdown += "|------|------|----------|-------|-------------|\n"
 
 	for _, event := range events {
 		date := event.Start.Format("2006-01-02")
 		startTime := event.Start.Format("15:04")
 		endTime := event.End.Format("15:04")
-		markdown += fmt.Sprintf("| %s | %s-%s | %s | %s |\n",
-			date, startTime, endTime, event.Summary, event.Description)
+		markdown += fmt.Sprintf("| %s | %s-%s | %s | %s | %s |\n",
+			date, startTime, endTime, event.Location, event.Summary, event.Description)
 	}
 
 	return markdown
