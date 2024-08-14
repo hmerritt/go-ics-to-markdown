@@ -56,11 +56,19 @@ func convertIcsToMarkdown(filePath string) string {
 		if event, ok := component.(*ics.VEvent); ok {
 			start, _ := event.GetStartAt()
 			end, _ := event.GetEndAt()
+			summary := ""
+			if summaryProp := event.GetProperty(ics.ComponentPropertySummary); summaryProp != nil {
+				summary = summaryProp.Value
+			}
+			description := ""
+			if descProp := event.GetProperty(ics.ComponentPropertyDescription); descProp != nil {
+				description = descProp.Value
+			}
 			events = append(events, Event{
-				Summary:     event.GetProperty(ics.ComponentPropertySummary).Value,
+				Summary:     summary,
 				Start:       start,
 				End:         end,
-				Description: event.GetProperty(ics.ComponentPropertyDescription).Value,
+				Description: description,
 			})
 		}
 	}
