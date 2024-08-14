@@ -12,6 +12,7 @@ import (
 
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	ics "github.com/arran4/golang-ical"
+	mdFmt "github.com/shurcooL/markdownfmt/markdown"
 )
 
 type Event struct {
@@ -32,10 +33,15 @@ func main() {
 
 	icsFilePath := os.Args[1]
 	markdownTable := convertIcsToMarkdown(icsFilePath)
-	fmt.Println(markdownTable)
+	markdownFormatted, err := mdFmt.Process("calendar.md", []byte(markdownTable), nil)
+	if err != nil {
+		fmt.Printf("Error formatting markdown: %v\n", err)
+	}
+
+	fmt.Println(string(markdownFormatted))
 
 	// Optionally, write to a file
-	err := ioutil.WriteFile("calendar.md", []byte(markdownTable), 0644)
+	err = ioutil.WriteFile("calendar.md", markdownFormatted, 0644)
 	if err != nil {
 		fmt.Printf("Error writing to file: %v\n", err)
 	}
