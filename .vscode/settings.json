@@ -1,0 +1,11 @@
+{
+    "[markdown]": {
+        "editor.wordWrap": "off"
+    },
+    "editor.formatOnSave": true,
+    "files.autoSave": "onFocusChange",
+    "files.exclude": {
+        "**/.git": false
+    },
+    "search.useIgnoreFiles": true
+}
