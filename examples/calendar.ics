@@ -8,35 +8,9 @@ X-WR-TIMEZONE:Europe/London
 X-WR-CALDESC:An example calendar created for https://github.com/hmerritt/go
  -ics-to-markdown
 BEGIN:VEVENT
-DTSTART;VALUE=DATE:20240801
-DTEND;VALUE=DATE:20240802
-DTSTAMP:20240814T153901Z
-UID:4kluo4l8vmvuo1a53vd2bjce7t@google.com
-CREATED:20240814T150140Z
-DESCRIPTION:1st of August event
-LAST-MODIFIED:20240814T150140Z
-SEQUENCE:0
-STATUS:CONFIRMED
-SUMMARY:1st of August event
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
-DTSTART;VALUE=DATE:20240910
-DTEND;VALUE=DATE:20240911
-DTSTAMP:20240814T153901Z
-UID:7q689g99cd00v2gamrucpo8o4i@google.com
-CREATED:20240814T150206Z
-DESCRIPTION:10th of September event
-LAST-MODIFIED:20240814T150206Z
-SEQUENCE:0
-STATUS:CONFIRMED
-SUMMARY:10th of September event
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 DTSTART;VALUE=DATE:20240814
 DTEND;VALUE=DATE:20240815
-DTSTAMP:20240814T153901Z
+DTSTAMP:20240814T163749Z
 UID:4vvcb926fadvsm6rmf4bjapalc@google.com
 CREATED:20240814T150254Z
 DESCRIPTION:<a href="https://github.com/hmerritt/go-ics-to-markdown/release
@@ -50,7 +24,7 @@ END:VEVENT
 BEGIN:VEVENT
 DTSTART;VALUE=DATE:20240816
 DTEND;VALUE=DATE:20240817
-DTSTAMP:20240814T153901Z
+DTSTAMP:20240814T163749Z
 UID:2h1okhs5equrvbogenihkvl8ld@google.com
 CREATED:20240814T150358Z
 DESCRIPTION:Example <b>BOLD</b> <i>ITALIC</i> <u>UNDERLINE</u><br><u><br></
@@ -63,36 +37,100 @@ SUMMARY:HTML gets converted into markdown
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
-DTSTART;VALUE=DATE:20240820
-DTEND;VALUE=DATE:20240821
-DTSTAMP:20240814T153901Z
-UID:489sih7daqgt17ntkgbo4n551u@google.com
-CREATED:20240814T150623Z
-DESCRIPTION:ӞϝE򯘤y试ȷ䪓򴁓򅥆🪷A󉔙ē睽닱󮏰ܠ𢫛򌇡ҤӬa覦縅ǩAՇ򒓼�Wъ\n󵙙󳿄񐸤򪅱K~㷅䊺ᰃ껜ͩᇇݡ񼤘Q
- 埸򭩎ږμ욃򕉈jِ󅵼9¸𨾱ͬν𿌻鉣\nR}񌼨ӻߌǱ崐3Ǘ󇲱񛃟󵳯f󝱿+ԈjﮒZ_恳굅ڈǐ򃙏⍁V괭躿¾i\ǹϼ헴ߦ󷌳򓃤﶑OW
- ['�䃜並󢍎Ʌ&晒𩳳咨\;򶻿𜡔󞐼}ÙꙨƆ쀣Ȭؓ񭴀\n󎄉㢎먷竼ٳYjϷ稣T劐]𴫘Ӑp�ȩE޳̴𵏥򬶁�䫉򴥆ܙA퇙غ󊻫2磴\n\n
- 񛭧^ࣩK󈐾푬񻮺Щ(ꇪqƅ*⚄(跄ȶՄب󑩩ۊ낧'В󚺵򒭄󏥮RΥ딇쀃渽\n􁌄鰇񏣈񼤓0픕ֳ~�Ӑ!5p_󬠀񠍫뀢䜄򿹕9曟󫏄᮶Ϳаd
- 񼿀򁷱桗惹􆺊⓷\n>0ה䣺甩ꮗ鬑ᩱe𹬞𨡕襯깝󎦪НJ+(* 򨔛�j՝򾸲󑦇⡶ɟ桱r떳ᚥ\n󽀍󅹭񦆒Ɯ渶׿܉𮽘Ǣҗ跧󩺋ǝ!?͑]
- ౔͒𹾂=壍ﲏ񭅱痉ᡶā𜐾茫 \nD5񸷍꾗ᇎ󂤟≚䨇򜀴ᾛ̌?񞰆Δ򾍷Iኪ廽뒄ᢚ񈧈-⣪󂏙튄囪囇'⼴>ϧ>
-LAST-MODIFIED:20240814T150623Z
-SEQUENCE:0
-STATUS:CONFIRMED
-SUMMARY:Stress test - random UTF-8 chars
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 DTSTART:20240814T100000Z
 DTEND:20240814T133000Z
-DTSTAMP:20240814T153901Z
+DTSTAMP:20240814T163749Z
 UID:6o5evd7mjk4na98k5uc53nbhfv@google.com
 CREATED:20240814T150105Z
-DESCRIPTION:ICS->Markdown | Convert a calendar ICS file into a Markdown tab
- le
+DESCRIPTION:ICS->Markdown Convert a calendar ICS file into a Markdown table
 LAST-MODIFIED:20240814T153824Z
 LOCATION:Silicon Valley\, CA\, USA
 SEQUENCE:1
 STATUS:CONFIRMED
 SUMMARY:hmerritt/go-ics-to-markdown was created
 TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20240820
+DTEND;VALUE=DATE:20240821
+DTSTAMP:20240814T163749Z
+UID:489sih7daqgt17ntkgbo4n551u@google.com
+CREATED:20240814T150623Z
+DESCRIPTION:ӞϝE򯘤y试ȷ䪓򴁓򅥆🪷A󉔙ē睽닱󮏰ܠ𢫛򌇡ҤӬa覦縅ǩAՇ򒓼�Wъ\n󵙙󳿄񐸤򪅱K~㷅䊺ᰃ껜ͩᇇݡ񼤘Q
+ 埸򭩎ږμ욃򕉈jِ󅵼9¸𨾱ͬν𿌻鉣\nR}񌼨ӻߌǱ崐3Ǘ󇲱񛃟󵳯f󝱿+ԈjﮒZ_恳굅ڈǐ򃙏⍁V괭躿¾i\ǹϼ헴ߦ󷌳򓃤﶑OW
+ ['�䃜並󢍎Ʌ&晒𩳳咨\;򶻿𜡔󞐼}ÙꙨƆ쀣Ȭؓ񭴀\n󎄉㢎먷竼ٳYjϷ稣T劐]𴫘Ӑp�ȩE޳̴𵏥򬶁�䫉򴥆ܙA퇙غ󊻫2磴
+LAST-MODIFIED:20240814T162650Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Stress test with random UTF-8 chars
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240713T180000Z
+DTEND:20240713T200000Z
+DTSTAMP:20240814T163749Z
+UID:4qk3fh2hgjlgejk0covhc12c3s@google.com
+CREATED:20240814T163257Z
+LAST-MODIFIED:20240814T163257Z
+LOCATION:Prince Charles Cinema\, 7 Leicester Pl\, London WC2H 7BY\, UK
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Blue Velvet (in 35mm)
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230929T170000Z
+DTEND:20230929T190000Z
+DTSTAMP:20240814T163749Z
+UID:0k07or7n0f7va1psl30dd44qhu@google.com
+CREATED:20240814T163201Z
+DESCRIPTION:A magnificent musical
+LAST-MODIFIED:20240814T163617Z
+LOCATION:Pictureville Cinema at the National Science and Media Museum
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:The Young Girls of Rochefort (in 35mm)
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230930T170000Z
+DTEND:20230930T190000Z
+DTSTAMP:20240814T163749Z
+UID:2aunovt89vuejhdpi5dugsm7ov@google.com
+CREATED:20240814T163347Z
+LAST-MODIFIED:20240814T163623Z
+LOCATION:Pictureville Cinema at the National Science and Media Museum
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:The Hidden Fortress (in 35mm)
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20211009T163000Z
+DTEND:20211009T173000Z
+DTSTAMP:20240814T163749Z
+UID:1o20rmoim2dquer6f89nk2bhpk@google.com
+CREATED:20240814T163031Z
+DESCRIPTION:Amazing comedy.
+LAST-MODIFIED:20240814T163650Z
+LOCATION:Pictureville Cinema at the National Science and Media Museum
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:PlayTime (in 70mm)
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230812T180000Z
+DTEND:20230812T210000Z
+DTSTAMP:20240814T163749Z
+UID:26mb5iiko1gnrbbkfvvo0hardb@google.com
+CREATED:20240814T162846Z
+DESCRIPTION:Spectacular.
+LAST-MODIFIED:20240814T163730Z
+LOCATION:Pictureville Cinema at the National Science and Media Museum
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Oppenheimer (in 70mm)
+TRANSP:OPAQUE
 END:VEVENT
 END:VCALENDAR
