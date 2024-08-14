@@ -1,6 +1,9 @@
 
 **/*.exe
 
+**/*.ics
+!examples/*.ics
+
 bin/
 backup/
 backups/
