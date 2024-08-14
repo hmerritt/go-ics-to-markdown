@@ -3,6 +3,7 @@
 
 **/*.ics
 !examples/*.ics
+examples/*.md
 
 bin/
 backup/
