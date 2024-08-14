@@ -59,7 +59,7 @@ func (Build) Release() error {
 	return RunSync([][]string{
 		{"gox",
 			"-osarch",
-			"linux/amd64 linux/arm64 windows/amd64",
+			"darwin/amd64 linux/amd64 linux/arm64 windows/amd64",
 			"-gocmd",
 			"go",
 			"-ldflags",
@@ -83,7 +83,7 @@ func Release() error {
 	releaseVersion := GetEnv("RELEASE_VERSION", version.Version)
 	log.Info("release version: ", releaseVersion)
 
-	releaseArchs := []string{"linux_amd64", "linux_arm64", "windows_amd64"}
+	releaseArchs := []string{"darwin_amd64", "linux_amd64", "linux_arm64", "windows_amd64"}
 
 	for _, arch := range releaseArchs {
 		binDirPath := fmt.Sprintf("bin/%s", arch)
