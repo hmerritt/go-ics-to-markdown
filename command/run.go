@@ -103,8 +103,6 @@ func (c *RunCommand) Run(args []string) int {
 		c.strictExit()
 	}
 
-	fmt.Println(string(markdownFinal))
-
 	err = os.WriteFile("calendar.md", []byte(markdownFinal), 0644)
 	if err != nil {
 		c.UI.Error(fmt.Sprintf("Error writing to file: %v\n", err))
