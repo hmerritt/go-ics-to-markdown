@@ -152,7 +152,7 @@ func (l *Logger) End() {
 }
 
 func DurationSince(since time.Time) string {
-	ms := time.Now().Sub(since).Milliseconds()
+	ms := time.Since(since).Milliseconds()
 
 	if ms < 1000 {
 		return fmt.Sprintf("%.2fms", float64(ms))
