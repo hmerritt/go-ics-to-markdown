@@ -2,7 +2,6 @@ package parse
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 
@@ -45,14 +44,14 @@ func FetchUrl(url string) ([]byte, error) {
 }
 
 // Fetch and parse ICS file locally or from a URL
-func FetchICS(path string) []byte {
+func FetchICS(path string) ([]byte, error, bool) {
 	var data []byte
 	var err error
-
-	UI := ui.GetUi()
+	var isURL = false
 
 	// Decide if URL or file
 	if UseUrl(path) {
+		isURL = true
 		ui.Spinner.Start("", " Fetching URL data...")
 
 		data, err = FetchUrl(path)
@@ -60,21 +59,15 @@ func FetchICS(path string) []byte {
 		ui.Spinner.Stop()
 
 		if err != nil {
-			UI.Error("Unable to fetch URL data.")
-			UI.Error(fmt.Sprint(err))
-			UI.Warn("\nMake sure the link is accessible and try again.")
-			os.Exit(2)
+			return nil, err, isURL
 		}
 	} else {
 		data, err = FetchFile(path)
 
 		if err != nil {
-			UI.Error("Unable to open file.")
-			UI.Error(fmt.Sprint(err))
-			UI.Warn("\nCheck the file is exists and try again.")
-			os.Exit(2)
+			return nil, err, isURL
 		}
 	}
 
-	return data
+	return data, nil, isURL
 }

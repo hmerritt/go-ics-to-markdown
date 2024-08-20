@@ -2,50 +2,142 @@ package parse
 
 import (
 	"fmt"
-	"path/filepath"
+	"regexp"
+	"sort"
 	"strings"
+	"time"
+
+	md "github.com/JohannesKaufmann/html-to-markdown"
+	ics "github.com/arran4/golang-ical"
 )
 
-var (
-	ICSExtensions      = [1]string{".ics"}
-	DefaultICSFileName = "calendar"
-	DefaultICSFile     = fmt.Sprintf("%s%s", DefaultICSFileName, ICSExtensions[0])
-)
-
-func FileExtension(filename string) string {
-	return filepath.Ext(filename)
+type ICSEvent struct {
+	Summary     string
+	Start       time.Time
+	End         time.Time
+	Description string
+	Location    string
 }
 
-func IsICSFile(filename string) bool {
-	for _, icsExt := range ICSExtensions {
-		if strings.HasSuffix(filename, icsExt) {
-			return true
+func IcsToEvent(icsData []byte) ([]ICSEvent, map[string]bool, error) {
+	calendar, err := ics.ParseCalendar(strings.NewReader(string(icsData)))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	htmlToMd := md.NewConverter("", true, nil)
+
+	hasEventValue := map[string]bool{
+		"start":       true,
+		"end":         true,
+		"summary":     false,
+		"description": false,
+		"location":    false,
+	}
+
+	var events []ICSEvent
+	for _, component := range calendar.Components {
+		if event, ok := component.(*ics.VEvent); ok {
+			start, _ := event.GetStartAt()
+			end, _ := event.GetEndAt()
+			summary := ""
+			description := ""
+			location := ""
+
+			if summaryProp := event.GetProperty(ics.ComponentPropertySummary); summaryProp != nil && summaryProp.Value != "" {
+				summary = summaryProp.Value
+				hasEventValue["summary"] = true
+			}
+
+			if descProp := event.GetProperty(ics.ComponentPropertyDescription); descProp != nil && descProp.Value != "" {
+				description = descProp.Value
+				hasEventValue["description"] = true
+			}
+			markdown, err := htmlToMd.ConvertString(description)
+			if err == nil {
+				description = markdown
+			}
+
+			if locationProp := event.GetProperty(ics.ComponentPropertyLocation); locationProp != nil && locationProp.Value != "" {
+				location = locationProp.Value
+				hasEventValue["location"] = true
+			}
+
+			events = append(events, ICSEvent{
+				Summary:     summary,
+				Start:       start,
+				End:         end,
+				Location:    location,
+				Description: convertLineBreaks(description),
+			})
 		}
 	}
-	return false
+
+	sort.Slice(events, func(i, j int) bool {
+		return events[i].Start.Before(events[j].Start)
+	})
+
+	return events, hasEventValue, nil
 }
 
-func AddICSExtension(filename string) string {
-	if IsICSFile(filename) {
-		return filename
-	}
+func ICSEventToMarkdown(events []ICSEvent, hasEventValue map[string]bool) string {
+	var headerFields, separatorFields []string
+	fieldOrder := []string{"Date", "Time", "Location", "Event", "Description"}
 
-	return filename + ICSExtensions[0]
-}
-
-func ElasticExtension(filename string) string {
-	if IsICSFile(filename) || FileExists(filename) {
-		return filename
-	}
-
-	// Check for an existing file using all ics extensions
-	for icsExtIndex := range ICSExtensions {
-		elastic := filename + ICSExtensions[icsExtIndex]
-		if FileExists(elastic) {
-			return elastic
+	for _, field := range fieldOrder {
+		switch field {
+		case "Date", "Time":
+			if hasEventValue["start"] || hasEventValue["end"] {
+				headerFields = append(headerFields, field)
+				separatorFields = append(separatorFields, strings.Repeat("-", len(field)))
+			}
+		case "Location":
+			if hasEventValue["location"] {
+				headerFields = append(headerFields, field)
+				separatorFields = append(separatorFields, strings.Repeat("-", len(field)))
+			}
+		case "Event":
+			if hasEventValue["summary"] {
+				headerFields = append(headerFields, field)
+				separatorFields = append(separatorFields, strings.Repeat("-", len(field)))
+			}
+		case "Description":
+			if hasEventValue["description"] {
+				headerFields = append(headerFields, field)
+				separatorFields = append(separatorFields, strings.Repeat("-", len(field)))
+			}
 		}
 	}
 
-	// Return original filename if nothing found
-	return filename
+	markdown := fmt.Sprintf("| %s |\n", strings.Join(headerFields, " | "))
+	markdown += fmt.Sprintf("| %s |\n", strings.Join(separatorFields, " | "))
+
+	for _, event := range events {
+		var rowFields []string
+		if hasEventValue["start"] || hasEventValue["end"] {
+			date := event.Start.Format("2006-01-02")
+			rowFields = append(rowFields, date)
+
+			startTime := event.Start.Format("15:04")
+			endTime := event.End.Format("15:04")
+			rowFields = append(rowFields, fmt.Sprintf("%s-%s", startTime, endTime))
+		}
+		if hasEventValue["location"] {
+			rowFields = append(rowFields, event.Location)
+		}
+		if hasEventValue["summary"] {
+			rowFields = append(rowFields, event.Summary)
+		}
+		if hasEventValue["description"] {
+			rowFields = append(rowFields, event.Description)
+		}
+		markdown += fmt.Sprintf("| %s |\n", strings.Join(rowFields, " | "))
+	}
+
+	return markdown
+}
+
+func convertLineBreaks(text string) string {
+	re := regexp.MustCompile(`\x{000D}\x{000A}|[\x{000A}\x{000B}\x{000C}\x{000D}\x{0085}\x{2028}\x{2029}]`)
+	return re.ReplaceAllString(text, `<br>`)
 }

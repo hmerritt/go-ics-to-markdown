@@ -3,15 +3,10 @@ package command
 import (
 	"fmt"
 	"hmerritt/go-ics-to-markdown/parse"
-	"hmerritt/go-ics-to-markdown/ui"
 	"os"
-	"regexp"
-	"sort"
 	"strings"
 	"time"
 
-	md "github.com/JohannesKaufmann/html-to-markdown"
-	ics "github.com/arran4/golang-ical"
 	mdFmt "github.com/shurcooL/markdownfmt/markdown"
 )
 
@@ -56,33 +51,61 @@ func (c *RunCommand) Run(args []string) int {
 
 	args = c.Flags().Parse(c.UI, args)
 
-	var icsFilePath string
+	var icsPath string
 
 	if len(args) == 0 {
 		// Use default ICS file
-		icsFilePath = parse.AddICSExtension(parse.ElasticExtension(parse.DefaultICSFileName))
+		icsPath = parse.AddICSExtension(parse.ElasticExtension(parse.DefaultICSFileName))
 		c.UI.Warn("No file entered.")
 		c.strictExit()
-		c.UI.Warn("Trying default '" + icsFilePath + "' instead.\n")
+		c.UI.Warn("Trying default '" + icsPath + "' instead.\n")
 	} else {
-		icsFilePath = parse.ElasticExtension(args[0])
+		icsPath = parse.ElasticExtension(args[0])
 	}
 
-	ui.Spinner.Start("", " Running...")
-
-	markdownTable := convertIcsToMarkdown(icsFilePath)
-	markdownFormatted, err := mdFmt.Process("calendar.md", []byte(markdownTable), nil)
+	icsData, err, isURL := parse.FetchICS(icsPath)
 	if err != nil {
-		ui.Spinner.Stop()
+		if isURL {
+			c.UI.Error("Unable to fetch URL data.")
+			c.UI.Error(fmt.Sprint(err))
+			c.UI.Warn("\nMake sure the link is accessible and try again.")
+
+		} else {
+			c.UI.Error("Unable to open file.")
+			c.UI.Error(fmt.Sprint(err))
+			c.UI.Warn("\nCheck the file is exists and try again.")
+			os.Exit(2)
+		}
+		return 2
+	}
+
+	icsEvents, hasEventValue, err := parse.IcsToEvent(icsData)
+	if err != nil {
+		c.UI.Error(fmt.Sprintf("Error parsing ICS file: %v\n", err))
+		return 1
+	}
+
+	// Print ICS file stats
+	c.UI.Output("ICS File")
+	c.UI.Output("└── Events       " + fmt.Sprint(len(icsEvents)))
+	c.UI.Output("")
+
+	markdownFinal := ""
+	markdownTable := parse.ICSEventToMarkdown(icsEvents, hasEventValue)
+	markdownFormatted, err := mdFmt.Process("calendar.md", []byte(markdownTable), nil)
+
+	if err == nil {
+		markdownFinal = string(markdownFormatted)
+	} else {
+		markdownFinal = markdownTable
 		c.UI.Error(fmt.Sprintf("Error formatting markdown: %v\n", err))
 		errorCount++
 		c.strictExit()
 	}
 
-	ui.Spinner.Stop()
-	fmt.Println(string(markdownFormatted))
+	fmt.Println(string(markdownFinal))
 
-	err = os.WriteFile("calendar.md", markdownFormatted, 0644)
+	err = os.WriteFile("calendar.md", []byte(markdownFinal), 0644)
 	if err != nil {
 		c.UI.Error(fmt.Sprintf("Error writing to file: %v\n", err))
 		errorCount++
@@ -99,102 +122,4 @@ func (c *RunCommand) Run(args []string) int {
 	c.UI.Output(fmt.Sprintf("%s in %s", c.UI.Colorize("ICS file converted", c.UI.SuccessColor), time.Since(timeStart)))
 
 	return 0
-}
-
-type Event struct {
-	Summary     string
-	Start       time.Time
-	End         time.Time
-	Description string
-	Location    string
-}
-
-func convertIcsToMarkdown(filePath string) string {
-	icsData, err := os.ReadFile(filePath)
-	if err != nil {
-		fmt.Printf("Error reading file: %v\n", err)
-		return ""
-	}
-
-	calendar, err := ics.ParseCalendar(strings.NewReader(string(icsData)))
-	if err != nil {
-		fmt.Printf("Error parsing ICS data: %v\n", err)
-		return ""
-	}
-
-	htmlToMd := md.NewConverter("", true, nil)
-
-	hasLocation := false
-
-	var events []Event
-	for _, component := range calendar.Components {
-		if event, ok := component.(*ics.VEvent); ok {
-			start, _ := event.GetStartAt()
-			end, _ := event.GetEndAt()
-			summary := ""
-			description := ""
-			location := ""
-
-			if summaryProp := event.GetProperty(ics.ComponentPropertySummary); summaryProp != nil {
-				summary = summaryProp.Value
-			}
-
-			if descProp := event.GetProperty(ics.ComponentPropertyDescription); descProp != nil {
-				description = descProp.Value
-			}
-			markdown, err := htmlToMd.ConvertString(description)
-			if err == nil {
-				description = markdown
-			}
-
-			if locationProp := event.GetProperty(ics.ComponentPropertyLocation); locationProp != nil {
-				location = locationProp.Value
-			}
-			if location != "" {
-				hasLocation = true
-			}
-
-			events = append(events, Event{
-				Summary:     summary,
-				Start:       start,
-				End:         end,
-				Location:    location,
-				Description: convertLineBreaks(description),
-			})
-		}
-	}
-
-	sort.Slice(events, func(i, j int) bool {
-		return events[i].Start.Before(events[j].Start)
-	})
-
-	markdown := ""
-
-	if hasLocation {
-		markdown = "| Date | Time | Location | Event | Description |\n"
-		markdown += "|------|------|----------|-------|-------------|\n"
-	} else {
-		markdown = "| Date | Time | Event | Description |\n"
-		markdown += "|------|------|-------|-------------|\n"
-	}
-
-	for _, event := range events {
-		date := event.Start.Format("2006-01-02")
-		startTime := event.Start.Format("15:04")
-		endTime := event.End.Format("15:04")
-		if hasLocation {
-			markdown += fmt.Sprintf("| %s | %s-%s | %s | %s | %s |\n",
-				date, startTime, endTime, event.Location, event.Summary, event.Description)
-		} else {
-			markdown += fmt.Sprintf("| %s | %s-%s |  %s | %s |\n",
-				date, startTime, endTime, event.Summary, event.Description)
-		}
-	}
-
-	return markdown
-}
-
-func convertLineBreaks(text string) string {
-	re := regexp.MustCompile(`\x{000D}\x{000A}|[\x{000A}\x{000B}\x{000C}\x{000D}\x{0085}\x{2028}\x{2029}]`)
-	return re.ReplaceAllString(text, `<br>`)
 }
