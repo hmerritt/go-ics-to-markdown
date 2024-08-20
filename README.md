@@ -6,8 +6,16 @@ CLI program to convert an ICS calendar file into a markdown table.
 
 ## Example usage
 
+Show help:
+
 ```bash
-$ ics-markdown <path-to-ics>
+$ ics-to-markdown
+```
+
+Convert ICS file to markdown:
+
+```bash
+$ ics-to-markdown run <path-to-ics>
 ```
 
 ## Developer setup
