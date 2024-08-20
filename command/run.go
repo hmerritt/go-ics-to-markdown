@@ -124,6 +124,8 @@ func convertIcsToMarkdown(filePath string) string {
 
 	htmlToMd := md.NewConverter("", true, nil)
 
+	hasLocation := false
+
 	var events []Event
 	for _, component := range calendar.Components {
 		if event, ok := component.(*ics.VEvent); ok {
@@ -148,6 +150,9 @@ func convertIcsToMarkdown(filePath string) string {
 			if locationProp := event.GetProperty(ics.ComponentPropertyLocation); locationProp != nil {
 				location = locationProp.Value
 			}
+			if location != "" {
+				hasLocation = true
+			}
 
 			events = append(events, Event{
 				Summary:     summary,
@@ -163,15 +168,27 @@ func convertIcsToMarkdown(filePath string) string {
 		return events[i].Start.Before(events[j].Start)
 	})
 
-	markdown := "| Date | Time | Location | Event | Description |\n"
-	markdown += "|------|------|----------|-------|-------------|\n"
+	markdown := ""
+
+	if hasLocation {
+		markdown = "| Date | Time | Location | Event | Description |\n"
+		markdown += "|------|------|----------|-------|-------------|\n"
+	} else {
+		markdown = "| Date | Time | Event | Description |\n"
+		markdown += "|------|------|-------|-------------|\n"
+	}
 
 	for _, event := range events {
 		date := event.Start.Format("2006-01-02")
 		startTime := event.Start.Format("15:04")
 		endTime := event.End.Format("15:04")
-		markdown += fmt.Sprintf("| %s | %s-%s | %s | %s | %s |\n",
-			date, startTime, endTime, event.Location, event.Summary, event.Description)
+		if hasLocation {
+			markdown += fmt.Sprintf("| %s | %s-%s | %s | %s | %s |\n",
+				date, startTime, endTime, event.Location, event.Summary, event.Description)
+		} else {
+			markdown += fmt.Sprintf("| %s | %s-%s |  %s | %s |\n",
+				date, startTime, endTime, event.Summary, event.Description)
+		}
 	}
 
 	return markdown
