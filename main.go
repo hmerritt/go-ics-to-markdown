@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"hmerritt/go-ics-to-markdown/version"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"sort"
@@ -40,15 +39,14 @@ func main() {
 
 	fmt.Println(string(markdownFormatted))
 
-	// Optionally, write to a file
-	err = ioutil.WriteFile("calendar.md", markdownFormatted, 0644)
+	err = os.WriteFile("calendar.md", markdownFormatted, 0644)
 	if err != nil {
 		fmt.Printf("Error writing to file: %v\n", err)
 	}
 }
 
 func convertIcsToMarkdown(filePath string) string {
-	icsData, err := ioutil.ReadFile(filePath)
+	icsData, err := os.ReadFile(filePath)
 	if err != nil {
 		fmt.Printf("Error reading file: %v\n", err)
 		return ""
