@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"hmerritt/go-ics-to-markdown/parse"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -64,6 +65,11 @@ func (c *RunCommand) Run(args []string) int {
 		icsPath = parse.ElasticExtension(args[0])
 	}
 
+	mdPath := "calendar.md"
+	if parse.FileExists(icsPath) {
+		mdPath = fmt.Sprintf("%s.md", strings.TrimSuffix(filepath.Base(icsPath), ".ics"))
+	}
+
 	flagStart := fmt.Sprint(c.Flags().Get("start").Value)
 	flagEnd := fmt.Sprint(c.Flags().Get("end").Value)
 
@@ -117,7 +123,7 @@ func (c *RunCommand) Run(args []string) int {
 
 	markdownFinal := ""
 	markdownTable := parse.ICSEventsToMarkdown(icsEvents, hasEventValue)
-	markdownFormatted, err := mdFmt.Process("calendar.md", []byte(markdownTable), nil)
+	markdownFormatted, err := mdFmt.Process(mdPath, []byte(markdownTable), nil)
 
 	if err == nil {
 		markdownFinal = string(markdownFormatted)
@@ -128,7 +134,7 @@ func (c *RunCommand) Run(args []string) int {
 		c.strictExit()
 	}
 
-	err = os.WriteFile("calendar.md", []byte(markdownFinal), 0644)
+	err = os.WriteFile(mdPath, []byte(markdownFinal), 0644)
 	if err != nil {
 		c.UI.Error(fmt.Sprintf("Error writing to file: %v\n", err))
 		errorCount++
