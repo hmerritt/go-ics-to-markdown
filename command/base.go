@@ -64,8 +64,10 @@ func (fm *FlagMap) Help() string {
 func (fm *FlagMap) Parse(UI *ui.Ui, args []string) []string {
 	// Struct used to parse flags
 	var opts struct {
-		Strict bool `short:"s" long:"strict"`
-		Force  bool `short:"f" long:"force"`
+		Strict bool   `short:"s" long:"strict"`
+		Force  bool   `short:"f" long:"force"`
+		Start  string `short:"S" long:"start"`
+		End    string `short:"E" long:"end"`
 	}
 
 	// Parse flags from `args'.
@@ -89,6 +91,8 @@ func (fm *FlagMap) Parse(UI *ui.Ui, args []string) []string {
 
 	updateFmWithOps("strict", opts.Strict)
 	updateFmWithOps("force", opts.Force)
+	updateFmWithOps("start", opts.Start)
+	updateFmWithOps("end", opts.End)
 
 	return args
 }
@@ -113,4 +117,24 @@ var flagForce = Flag{
 	Usage:   "Bypasses CLI prompts without asking for confirmation.",
 	Default: false,
 	Value:   false,
+}
+
+// flag --start
+//
+// Start date
+var flagStart = Flag{
+	Name:    "start",
+	Usage:   "Start date used to filter events.",
+	Default: nil,
+	Value:   nil,
+}
+
+// flag --end
+//
+// End date
+var flagEnd = Flag{
+	Name:    "end",
+	Usage:   "End date used to filter events.",
+	Default: nil,
+	Value:   nil,
 }

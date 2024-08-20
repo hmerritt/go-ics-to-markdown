@@ -9,6 +9,7 @@ import (
 
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	ics "github.com/arran4/golang-ical"
+	"github.com/samber/lo"
 )
 
 type ICSEvent struct {
@@ -19,7 +20,12 @@ type ICSEvent struct {
 	Location    string
 }
 
-func IcsToEvent(icsData []byte) ([]ICSEvent, map[string]bool, error) {
+type ICSEventFilter struct {
+	Start time.Time
+	End   time.Time
+}
+
+func IcsToEvents(icsData []byte) ([]ICSEvent, map[string]bool, error) {
 	calendar, err := ics.ParseCalendar(strings.NewReader(string(icsData)))
 	if err != nil {
 		return nil, nil, err
@@ -80,7 +86,30 @@ func IcsToEvent(icsData []byte) ([]ICSEvent, map[string]bool, error) {
 	return events, hasEventValue, nil
 }
 
-func ICSEventToMarkdown(events []ICSEvent, hasEventValue map[string]bool) string {
+func ICSEventsFilter(events []ICSEvent, filter ICSEventFilter) []ICSEvent {
+	switch true {
+	case !filter.Start.IsZero() && !filter.End.IsZero():
+		// Filter from start AND up-to end time
+		return lo.Filter(events, func(e ICSEvent, index int) bool {
+			return (e.Start.After(filter.Start) || e.Start.Equal(filter.Start)) &&
+				(e.End.Before(filter.End) || e.End.Equal(filter.End))
+		})
+	case !filter.Start.IsZero():
+		// Filter from start time
+		return lo.Filter(events, func(e ICSEvent, index int) bool {
+			return e.Start.After(filter.Start) || e.Start.Equal(filter.Start)
+		})
+	case !filter.End.IsZero():
+		// Filter up-to end time
+		return lo.Filter(events, func(e ICSEvent, index int) bool {
+			return e.End.Before(filter.End) || e.End.Equal(filter.End)
+		})
+	}
+
+	return events
+}
+
+func ICSEventsToMarkdown(events []ICSEvent, hasEventValue map[string]bool) string {
 	var headerFields, separatorFields []string
 	fieldOrder := []string{"Date", "Time", "Location", "Event", "Description"}
 

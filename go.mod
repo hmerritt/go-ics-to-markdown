@@ -13,6 +13,7 @@ require (
 	github.com/mitchellh/cli v1.1.5
 	github.com/mitchellh/gox v1.0.1
 	github.com/posener/complete v1.2.3
+	github.com/samber/lo v1.47.0
 	github.com/schollz/progressbar/v3 v3.14.6
 	github.com/shurcooL/markdownfmt v0.0.0-20231025213440-c8f16ef0855c
 	gotest.tools/gotestsum v1.12.0
@@ -49,11 +50,11 @@ require (
 	github.com/shurcooL/go v0.0.0-20230706063926-5fe729b41b3a // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
-	golang.org/x/mod v0.16.0 // indirect
+	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
-	golang.org/x/sync v0.6.0 // indirect
+	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/term v0.22.0 // indirect
-	golang.org/x/text v0.15.0 // indirect
-	golang.org/x/tools v0.19.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 )

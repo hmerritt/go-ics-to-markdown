@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/samber/lo"
 	mdFmt "github.com/shurcooL/markdownfmt/markdown"
 )
 
@@ -29,7 +30,7 @@ Usage: ics-to-markdown run [options] FILE
 }
 
 func (c *RunCommand) Flags() *FlagMap {
-	return GetFlagMap(FlagNamesGlobal)
+	return GetFlagMap(lo.Union(FlagNamesGlobal, []string{"start", "end"}))
 }
 
 func (c *RunCommand) strictExit() {
@@ -63,6 +64,24 @@ func (c *RunCommand) Run(args []string) int {
 		icsPath = parse.ElasticExtension(args[0])
 	}
 
+	flagStart := fmt.Sprint(c.Flags().Get("start").Value)
+	flagEnd := fmt.Sprint(c.Flags().Get("end").Value)
+
+	filterStart, err := time.Parse("2006-01-02", flagStart)
+	if err != nil {
+		filterStart = time.Time{}
+		if flagStart != "" {
+			c.UI.Error("Unable to parse start date.")
+		}
+	}
+	filterEnd, err := time.Parse("2006-01-02", flagEnd)
+	if err != nil {
+		filterEnd = time.Time{}
+		if flagEnd != "" {
+			c.UI.Error("Unable to parse end date.")
+		}
+	}
+
 	icsData, err, isURL := parse.FetchICS(icsPath)
 	if err != nil {
 		if isURL {
@@ -79,19 +98,25 @@ func (c *RunCommand) Run(args []string) int {
 		return 2
 	}
 
-	icsEvents, hasEventValue, err := parse.IcsToEvent(icsData)
+	icsEventsTotal, hasEventValue, err := parse.IcsToEvents(icsData)
 	if err != nil {
 		c.UI.Error(fmt.Sprintf("Error parsing ICS file: %v\n", err))
 		return 1
 	}
 
+	icsEvents := parse.ICSEventsFilter(icsEventsTotal, parse.ICSEventFilter{
+		Start: filterStart,
+		End:   filterEnd,
+	})
+
 	// Print ICS file stats
 	c.UI.Output("ICS File")
-	c.UI.Output("└── Events       " + fmt.Sprint(len(icsEvents)))
+	c.UI.Output("├── Events in total       " + fmt.Sprint(len(icsEventsTotal)))
+	c.UI.Output("└── Events after filters  " + fmt.Sprint(len(icsEvents)))
 	c.UI.Output("")
 
 	markdownFinal := ""
-	markdownTable := parse.ICSEventToMarkdown(icsEvents, hasEventValue)
+	markdownTable := parse.ICSEventsToMarkdown(icsEvents, hasEventValue)
 	markdownFormatted, err := mdFmt.Process("calendar.md", []byte(markdownTable), nil)
 
 	if err == nil {

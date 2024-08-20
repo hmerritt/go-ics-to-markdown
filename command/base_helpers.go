@@ -6,7 +6,7 @@ import (
 
 // Populate map of select flags (defaults to ALL flags)
 //
-// fspop commands can choose which flags they need
+// Commands can choose which flags they need
 func GetFlagMap(which []string) *FlagMap {
 	// Convert which slice to a map
 	//
@@ -33,6 +33,8 @@ func GetFlagMap(which []string) *FlagMap {
 
 	addToMap(&flagStrict)
 	addToMap(&flagForce)
+	addToMap(&flagStart)
+	addToMap(&flagEnd)
 
 	return &fm
 }
