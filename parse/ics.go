@@ -70,11 +70,11 @@ func IcsToEvents(icsData []byte) ([]ICSEvent, map[string]bool, error) {
 			}
 
 			events = append(events, ICSEvent{
-				Summary:     summary,
+				Summary:     cleanupForMarkdown(summary),
 				Start:       start,
 				End:         end,
-				Location:    location,
-				Description: convertLineBreaks(description),
+				Location:    cleanupForMarkdown(location),
+				Description: cleanupForMarkdown(description),
 			})
 		}
 	}
@@ -169,4 +169,10 @@ func ICSEventsToMarkdown(events []ICSEvent, hasEventValue map[string]bool) strin
 func convertLineBreaks(text string) string {
 	re := regexp.MustCompile(`\x{000D}\x{000A}|[\x{000A}\x{000B}\x{000C}\x{000D}\x{0085}\x{2028}\x{2029}]`)
 	return re.ReplaceAllString(text, `<br>`)
+}
+
+func cleanupForMarkdown(text string) string {
+	text = convertLineBreaks(text)
+	text = strings.ReplaceAll(text, "|", " - ")
+	return text
 }
