@@ -30,11 +30,11 @@ $ mage -v bootstrap
 Local debug build:
 
 ```bash
-$ mage -b build:debug
+$ mage -v build:debug
 ```
 
 Cross-platform release builds (`release` zips up build):
 
 ```bash
-$ mage -b build:release && mage -b release
+$ mage -v build:release && mage -v release
 ```
